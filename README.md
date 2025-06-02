@@ -5,6 +5,9 @@
 ## Infos
 Advanced FiveM-External-Triggerbot, featuring a GUI, config and much more.
 
+## Preview
+- https://lite.neverlose.me/uyg5dbnz.mp4
+
 ## Features
 - Key system
 - Tray-Icon

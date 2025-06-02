@@ -24,7 +24,6 @@ from pystray import Icon, MenuItem, Menu
 from PIL import Image, ImageDraw
 import requests
 from io import BytesIO
-import mysql.connector
 import atexit
 import uuid
 
@@ -34,12 +33,7 @@ running = False
 alive = True
 tray_icon = None
 start_time = None
-DB_HOST = '176.96.139.184'
-DB_USER = 'root'
-DB_PASSWORD = 'astra321'
-DB_NAME = 'astra'
 CONFIG_FILENAME = 'astra.json'
-LICENSE_FILE = os.path.join(os.path.expanduser('~'), 'license.key')
 
 class Colors:
     RESET = '[0m'
@@ -114,65 +108,6 @@ def progress_bar(task='Loading', duration=1.5):
         sys.stdout.flush()
         time.sleep(duration + steps)
     print()
-
-def get_hwid():
-    hwid = hex(uuid.getnode())
-    return hwid
-
-def delete_license_file():
-    if os.path.exists(LICENSE_FILE):
-        try:
-            os.remove(LICENSE_FILE)
-        except Exception as e:
-            print(f'{Colors.RED}[LICENSE]{Colors.RESET} Error deleting {LICENSE_FILE}: {e}')
-atexit.register(delete_license_file)
-
-def check_license():
-    if not os.path.exists(LICENSE_FILE):
-        print(f'{Colors.GRAY}╔══════════════════════════════════════╗{Colors.RESET}')
-        print(f'{Colors.GRAY}║{Colors.BRIGHT_WHITE}         LICENSE VERIFICATION         {Colors.GRAY}║{Colors.RESET}')
-        print(f'{Colors.GRAY}╚══════════════════════════════════════╝{Colors.RESET}')
-        key = input(f'{Colors.BRIGHT_WHITE}Please enter your license key: {Colors.RESET}').strip()
-        hwid = get_hwid()
-        with open(LICENSE_FILE, 'w') as f:
-            f.write(f'{key}\n{hwid}')
-    else:  # inserted
-        with open(LICENSE_FILE, 'r') as f:
-            key, hwid = f.read().strip().split('\n')
-    try:
-        connection = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_NAME)
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM licenses WHERE license_key = %s', (key,))
-        result = cursor.fetchone()
-        if result is None:
-            print(f'{Colors.BG_RED}{Colors.WHITE}[LICENSE] Invalid license key.{Colors.RESET}')
-            time.sleep(3)
-            sys.exit(1)
-        if result.get('banned', False):
-            print(f'{Colors.BG_RED}{Colors.WHITE}[LICENSE] This license has been banned.{Colors.RESET}')
-            time.sleep(3)
-            sys.exit(1)
-        if not result.get('is_active', False):
-            print(f'{Colors.BG_RED}{Colors.WHITE}[LICENSE] License is deactivated.{Colors.RESET}')
-            time.sleep(3)
-            sys.exit(1)
-        if result['hwid'] is None:
-            print(f'{Colors.BRIGHT_YELLOW}[LICENSE] First time login detected. Locking HWID.{Colors.RESET}')
-            cursor.execute('UPDATE licenses SET hwid = %s WHERE license_key = %s', (hwid, key))
-            connection.commit()
-        if result['hwid']!= hwid:
-            print(f'{Colors.BG_RED}{Colors.WHITE}[LICENSE] License is not valid for this machine.{Colors.RESET}')
-            time.sleep(3)
-            sys.exit(1)
-        print(f'{Colors.BG_GREEN}{Colors.BLACK} LICENSE VALID {Colors.RESET} {Colors.GREEN}Welcome back!{Colors.RESET}')
-        cursor.close()
-        connection.close()
-    except mysql.connector.Error as err:
-        print(f'{Colors.BG_RED}{Colors.WHITE}[LICENSE] Database error: {err}{Colors.RESET}')
-        time.sleep(3)
-        sys.exit(1)
-default_config = {'kill_script_keybind': '#', 'toggle_script_keybind': 'left_alt', 'min_delay': 0.01, 'max_delay': 0.02, 'check_interval': 0.01, 'color_range': {'min_red': 192, 'max_red': 194}, 'icon_url': 'https://i.ibb.co/Ng1bCpdx/b2dv-Ln-Bu-Zw.png', 'theme': {'status_on_color': 'green', 'status_off_color': 'red'}, 'use_21_9_check': False, 'monitor_21_9': 0}
-config = {}
 
 def load_config():
     global current_delay  # inserted
@@ -483,7 +418,6 @@ if __name__ == '__main__':
         start_sharex_and_exit()
     show_console()
     loading_animation()
-    check_license()
     show_welcome_screen()
     load_config()
     print(f'{Colors.GRAY}╔═════════════════════════════════════╗{Colors.RESET}')

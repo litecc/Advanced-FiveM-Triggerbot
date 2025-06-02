@@ -24,4 +24,4 @@ Open start.bat and follow the steps
 ## Contact
 `@litecc` on discord
 
-Credits: `@rio.py`
+Credits: `@rio.py` + `@s6ns`

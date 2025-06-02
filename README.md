@@ -17,4 +17,5 @@ Since people are selling easy things like this watch out for scammers / skids
 
 ## Contact
 `@litecc` on discord
+
 Credits: `@rio.py`

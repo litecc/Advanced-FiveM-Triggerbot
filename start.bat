@@ -17,7 +17,7 @@ if %errorlevel% neq 0 (
 echo [~] Installing packages
 python -m pip install --upgrade pyautogui keyboard pillow pystray requests psutil pywin32
 
-:: Starte das Skript
+:: Start the script
 echo [~] Starting Triggerbot...
 python "%~dp0triggerbot.py"
 echo [~] If it doesnt start automatically please start the .py yourself!
